@@ -1,23 +1,15 @@
-import { createWrapper } from "next-redux-wrapper";
 import { applyMiddleware, createStore, compose } from "redux";
-import { composeWithDevTools } from "redux-devtools-extension";
 import createSagaMiddleware from "redux-saga";
+import { createWrapper } from "next-redux-wrapper";
+import { composeWithDevTools } from "redux-devtools-extension";
 
 import reducer from "../reducers";
-import rootSaga from "../sagas"; //saga 설정 방법
-
-const loggerMiddleware =
-  ({ dispatch, getState }) =>
-  (next) =>
-  (action) => {
-    console.log(action);
-    return next(action);
-  };
+import rootSaga from "../sagas";
 
 const configureStore = (context) => {
   console.log(context);
   const sagaMiddleware = createSagaMiddleware();
-  const middlewares = [sagaMiddleware, loggerMiddleware];
+  const middlewares = [sagaMiddleware];
   const enhancer =
     process.env.NODE_ENV === "production"
       ? compose(applyMiddleware(...middlewares))

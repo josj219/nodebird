@@ -18,7 +18,7 @@ const Signup = () => {
   const [email, onChangeEmail] = useInput("");
   const [nickname, onChangeNickname] = useInput("");
   // const [id, setId] = useState("");
-  //
+  //g
   //   const onChangeId = useCallback((e) => {
   //     setId(e.target.value);
   //   }, []);
@@ -33,10 +33,13 @@ const Signup = () => {
   const dispatch = useDispatch();
   const { signUpLoading, me } = useSelector((state) => state.user);
 
-  const onChangePasswordCheck = useCallback(() => {
-    setPasswordCheck(e.target.value);
-    setPasswordError(e.target.value !== password);
-  }, [password]);
+  const onChangePasswordCheck = useCallback(
+    (e) => {
+      setPasswordCheck(e.target.value);
+      setPasswordError(e.target.value !== password);
+    },
+    [password]
+  );
 
   const onChangeTerm = useCallback((e) => {
     setTerm(e.target.checked);
