@@ -1,4 +1,6 @@
 const express = require("express");
+const cors = require("cors");
+
 const postRouter = require("./routes/post");
 const userRouter = require("./routes/user");
 const db = require("./models");
@@ -8,8 +10,11 @@ db.sequelize.sync().then(() => {
   console.log("db 연결성공");
 });
 
-app.use(express.json()); // front 에서 보낸 데이터 req에 넣어줌
-app.use(express.urlencoded({ extended: true })); // 둘다 미들웨어라서 실행될 놈들 (다른 라우터들) 보다 위에 와야한다
+app.use(cors({ origin: true, credentials: false }));
+app.use(express.json()); // front 에서 json 형식으로 data 보낼 때
+app.use(express.urlencoded({ extended: true })); // form submit 했을 때
+// ㄴfront 에서 보낸 데이터 req에 넣어줌
+// ㄴ둘다 미들웨어라서 실행될 놈들 (다른 라우터들) 보다 위에 와야한다
 
 app.get("/", (req, res) => {
   res.send("hello express");
