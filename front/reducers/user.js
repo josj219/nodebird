@@ -155,11 +155,13 @@ const reducer = (state = initialState, action) =>
         draft.logInDone = false;
         break;
       case LOG_IN_SUCCESS:
+        console.log("login success");
         draft.logInLoading = false;
         draft.logInDone = true;
         draft.me = dummyUser(action.data);
         break;
       case LOG_IN_FAILURE:
+        console.log("login 실패");
         draft.logInLoading = false;
         draft.logInError = action.error;
         break;
@@ -186,7 +188,6 @@ const reducer = (state = initialState, action) =>
       case SIGN_UP_SUCCESS:
         draft.signUpLoading = false;
         draft.signUpDone = true;
-        draft.me = dummyUser;
         break;
       case SIGN_UP_FAILURE:
         draft.signUpLoading = false;

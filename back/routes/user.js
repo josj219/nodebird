@@ -13,7 +13,8 @@ router.post("/", async (req, res, next) => {
       },
     });
     if (exUser) {
-      return res.stats(403).send("이미 사용중인 아이디입니다.");
+      console.log("이미 사용중인 아이디");
+      return res.status(403).send("이미 사용중인 아이디입니다.");
     }
     const hashedPassword = await bcrypt.hash(req.body.password, 12); // 숫자 높을 수록 보안 세진다
     await User.create({
@@ -21,6 +22,7 @@ router.post("/", async (req, res, next) => {
       nickname: req.body.nickname,
       password: hashedPassword,
     });
+    console.log("아이디 생성 완료");
     res.send("ok");
   } catch (error) {
     console.log(error);
