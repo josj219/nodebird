@@ -29,6 +29,7 @@ module.exports = () => {
 
             return done(null, user); // 두번째 자리가 성공
           }
+          console.log("비밀번호 틀림");
           return done(null, false, { reason: "비밀번호가 틀렸습니다." });
         } catch (error) {
           console.error(error);

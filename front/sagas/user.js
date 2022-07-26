@@ -50,8 +50,8 @@ function logOutAPI() {
 
 function* logOut() {
   try {
-    // const result = yield call(logOutAPI);
-    yield delay(1000); // setTime 같은 역할 - 데이터 없으니 일단 서버 구현 전까지 효과만 줘봐자
+    yield call(logOutAPI);
+    //yield delay(1000); // setTime 같은 역할 - 데이터 없으니 일단 서버 구현 전까지 효과만 줘봐자
     yield put({
       type: LOG_OUT_SUCCESS,
     });

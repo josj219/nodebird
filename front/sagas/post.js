@@ -7,6 +7,7 @@ import {
   put,
   takeLatest,
   throttle,
+  call,
 } from "redux-saga/effects";
 
 import {
@@ -27,7 +28,28 @@ import {
 import { ADD_POST_TO_ME, REMOVE_POST_OF_ME } from "../reducers/user";
 
 function addPostAPI(data) {
-  return axios.post("/api/post", data);
+  return axios.post("/post", data);
+}
+
+function* addPost(action) {
+  try {
+    const result = yield call(addPostAPI, action.data);
+    yield put({
+      type: ADD_POST_SUCCESS,
+      data: result.data,
+    });
+    yield put({
+      type: ADD_POST_TO_ME,
+      data: result.data.id,
+    });
+    //이렇게 사가에서 여러 개 액션 dispatch 호출해주면 여러 리듀서 데이터 바꿀 수 있음
+  } catch (err) {
+    console.error(err);
+    yield put({
+      type: ADD_POST_FAILURE,
+      data: err.response.data,
+    });
+  }
 }
 
 function* loadPost(action) {
@@ -48,44 +70,18 @@ function* loadPost(action) {
   }
 }
 
-function* addPost(action) {
-  try {
-    // const result = yield call(addPostAPI, action.data);
-    yield delay(1000);
-    const id = shortId.generate();
-    yield put({
-      type: ADD_POST_SUCCESS,
-      data: {
-        id,
-        content: action.data,
-      },
-    });
-    yield put({
-      type: ADD_POST_TO_ME,
-      data: id,
-    });
-    //이렇게 사가에서 여러 개 액션 dispatch 호출해주면 여러 리듀서 데이터 바꿀 수 있음
-  } catch (err) {
-    console.error(err);
-    yield put({
-      type: ADD_POST_FAILURE,
-      data: err.response.data,
-    });
-  }
-}
-
 function addCommentAPI(data) {
-  return axios.post("/api/post/${data.postId}}/comment", data);
+  return axios.post("/post/${data.postId}}/comment", data); // 백엔드 사람이 알 수 있도록
 }
 
 function* addComment(action) {
   try {
-    // const result = yield call(addPostAPI, action.data);
+    const result = yield call(addPostAPI, action.data);
     yield delay(1000);
     console.log("ADDDDDDDD!!!!!!");
     yield put({
       type: ADD_COMMENT_SUCCESS,
-      data: action.data,
+      data: result.data,
 
       // action.data,
     });
