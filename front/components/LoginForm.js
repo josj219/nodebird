@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useMemo } from "react";
+import React, { useCallback, useEffect } from "react";
 import { Form, Input, Button } from "antd";
 import Link from "next/link";
 import styled from "styled-components";
@@ -24,6 +24,7 @@ const LoginForm = () => {
   const [email, onChangeEmail] = useInput("");
   const [password, onChangePassword] = useInput("");
   const dispatch = useDispatch();
+  const { logInLoading, logInError } = useSelector((state) => state.user);
 
   //  const [nickname, onChangeNickname] = useInput("");
 
@@ -37,13 +38,18 @@ const LoginForm = () => {
   //   const onChangePassword = useCallback((e) => {
   //     setPassword(e.target.value);
   //   }, []);
+  useEffect(() => {
+    if (logInError) {
+      alert(logInError);
+    }
+  }, [logInError]);
 
   const onSubmitForm = useCallback(() => {
     //component에 넣는거는 이렇게 해줘야
     console.log(email, password);
-    dispatch(loginRequestAction(email, password));
+    dispatch(loginRequestAction({ email, password }));
   }, [email, password]);
-  const { logInLoading } = useSelector((state) => state.user);
+
   return (
     <FormWrapper onFinish={onSubmitForm}>
       <div>
