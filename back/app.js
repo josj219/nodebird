@@ -11,6 +11,7 @@ const passportConfig = require("./passport");
 const dotenv = require("dotenv");
 
 dotenv.config();
+
 db.sequelize
   .sync()
   .then(() => {
@@ -18,12 +19,12 @@ db.sequelize
   })
   .catch(console.error);
 passportConfig();
-app.use(cors({ origin: true, credentials: false }));
+app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 app.use(express.json()); // front 에서 json 형식으로 data 보낼 때
 app.use(express.urlencoded({ extended: true })); // form submit 했을 때
 // ㄴfront 에서 보낸 데이터 req에 넣어줌
 // ㄴ둘다 미들웨어라서 실행될 놈들 (다른 라우터들) 보다 위에 와야한다
-console.log(process.env.COOKIE_SECRET);
+
 app.use(cookieParser(process.env.COOKIE_SECRET));
 app.use(
   session({

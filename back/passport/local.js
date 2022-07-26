@@ -4,6 +4,7 @@ const bcrypt = require("bcryptjs");
 const { User } = require("../models");
 
 module.exports = () => {
+  console.log("검증들어갑니다");
   passport.use(
     new LocalStrategy(
       {

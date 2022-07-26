@@ -7,13 +7,15 @@ const router = express.Router();
 router.post("/login", (req, res, next) => {
   console.log("LOGIN ROUTES RECEIVE API");
   passport.authenticate("local", (err, user, info) => {
+    console.log("authenticate 완료");
     if (err) {
       console.error(err);
+      console.log(err);
       return next(error);
     }
     if (info) {
-      console.log(info.reason);
-      return res.status(401).send(info.reason); //http 상태코드 검색하면 알 수 잇음
+      console.log(info);
+      return res.status(401).send(info); //http 상태코드 검색하면 알 수 잇음
     }
     return req.login(user, async (loginErr) => {
       // 패스포트 로그인 에러임 - 이건 우리 서비스랑 관계 ㄴㄴ 살면서 에러난지 없다
