@@ -54,7 +54,8 @@ router.post("/login", isNotLoggedIn, (req, res, next) => {
   })(req, res, next);
 });
 
-router.post("/user/logout", isLoggedIn, (req, res) => {
+router.post("/logout", isLoggedIn, (req, res) => {
+  console.log("LOGOUT 시도");
   req.logout();
   req.session.destroy();
   res.send("ok");
@@ -69,7 +70,7 @@ router.post("/", async (req, res, next) => {
       },
     });
     if (exUser) {
-      return res.stats(403).send("이미 사용중인 아이디입니다.");
+      return res.status(403).send("이미 사용중인 아이디입니다.");
     }
     const hashedPassword = await bcrypt.hash(req.body.password, 12); // 숫자 높을 수록 보안 세진다
     //const hashedPassword = req.body.password; // 숫자 높을 수록 보안 세진다
