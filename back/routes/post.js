@@ -7,7 +7,8 @@ const { isLoggedIn } = require("./middlewares");
 router.post("/", async (req, res, next) => {
   try {
     console.log("POST REQUEST API RECEIVED");
-    console.log(req);
+    console.log(req.body.content);
+    console.log(req.user.id);
     const post = await Post.create({
       content: req.body.content,
       UserId: req.user.id,
