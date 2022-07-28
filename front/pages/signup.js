@@ -9,6 +9,7 @@ import AppLayout from "../components/AppLayout";
 import useInput from "../hooks/useInput";
 import { SIGN_UP_REQUEST } from "../reducers/user";
 import { useDispatch, useSelector } from "react-redux";
+import Router from "next/router";
 
 const ErrorMessage = styled.div`
   color: red;
