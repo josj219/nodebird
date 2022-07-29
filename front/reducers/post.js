@@ -29,7 +29,7 @@ export const generateDummyPost = (number) =>
       content: faker.lorem.paragraph(),
       Images: [
         {
-          src: faker.image.image(),
+          src: "https://picsum.photos/seed/picsum/200/100",
         },
       ],
       Comments: [
@@ -59,7 +59,7 @@ export const ADD_COMMENT_REQUEST = "ADD_COMMENT_REQUEST";
 export const ADD_COMMENT_SUCCESS = "ADD_COMMENT_SUCCESS";
 export const ADD_COMMENT_FAILURE = "ADD_COMMENT_FAILURE";
 
-export const addPostRequest = (data) => ({
+export const addPost = (data) => ({
   type: ADD_POST_REQUEST,
   data,
 });
@@ -105,7 +105,7 @@ const reducer = (state = initialState, action) => {
         draft.loadPostsLoading = false;
         draft.loadPostsDone = true;
         // draft.mainPosts = action.data.concat(draft.mainPosts);
-        draft.mainPosts = action.data.concat(action.data);
+        draft.mainPosts = draft.mainPosts.concat(action.data);
         draft.hasMorePosts = draft.mainPosts.length < 11; // bool 이다
         break;
       case LOAD_POSTS_FAILURE:

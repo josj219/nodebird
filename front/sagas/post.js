@@ -8,6 +8,7 @@ import {
   throttle,
   call,
 } from "redux-saga/effects";
+import shortId from "shortid";
 
 import {
   ADD_POST_REQUEST,
@@ -27,12 +28,14 @@ import {
 import { ADD_POST_TO_ME, REMOVE_POST_OF_ME } from "../reducers/user";
 
 function addPostAPI(data) {
-  return axios.post("/post", data);
+  return axios.post("/post", { content: data });
 }
 
 function* addPost(action) {
   try {
+    console.log("ADDPOST API CALL ");
     const result = yield call(addPostAPI, action.data);
+    const id = shortId.generate();
     yield put({
       type: ADD_POST_SUCCESS,
       data: result.data,
@@ -70,12 +73,13 @@ function* loadPost(action) {
 }
 
 function addCommentAPI(data) {
-  return axios.post("/post/${data.postId}}/comment", data); // 백엔드 사람이 알 수 있도록
+  return axios.post(`/post/${data.postId}}/comment`, data); // 백엔드 사람이 알 수 있도록
 }
 
 function* addComment(action) {
   try {
-    const result = yield call(addPostAPI, action.data);
+    console.log("addComment REQUEST RECEIVED");
+    const result = yield call(addCommentAPI, action.data);
     yield delay(1000);
     console.log("ADDDDDDDD!!!!!!");
     yield put({

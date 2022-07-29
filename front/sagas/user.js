@@ -2,6 +2,9 @@ import { all, delay, fork, put, takeLatest, call } from "redux-saga/effects";
 import axios from "axios";
 
 import {
+  LOAD_USER_FAILURE,
+  LOAD_USER_REQUEST,
+  LOAD_USER_SUCCESS,
   LOG_IN_FAILURE,
   LOG_IN_REQUEST,
   LOG_IN_SUCCESS,
@@ -18,6 +21,30 @@ import {
   UNFOLLOW_REQUEST,
   UNFOLLOW_SUCCESS,
 } from "../reducers/user";
+
+function loadUserAPI() {
+  return axios.get("/user");
+}
+
+function* loadUser(action) {
+  try {
+    const result = yield call(loadUserAPI, action.data);
+    // call 은 동기 라서 결과값 기다린다 , fork 는 비동기라서 결과값 안받고 바로 다음꺼 실행
+    yield delay(1000);
+    yield put({
+      //yield 넣어두는 이유 - generator는 테스트하기가 좋음 - 하나하나씩 보면서 문제가 어딘지
+      type: LOAD_USER_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    console.error(err);
+    yield put({
+      // 요 밑에 2개 이게 액션 개체인데, put은 거의 dispatch (액션을 하는) 느낌
+      type: LOAD_USER_FAILURE,
+      error: err.response.data,
+    });
+  }
+}
 
 function logInAPI(data) {
   return axios.post("/user/login", data);
@@ -127,6 +154,10 @@ function* unfollow(action) {
   }
 }
 
+function* watchLoadUser() {
+  yield takeLatest(LOAD_USER_REQUEST, loadUser);
+}
+
 function* watchFollow() {
   yield takeLatest(FOLLOW_REQUEST, follow);
 }
@@ -157,6 +188,7 @@ function* watchSignup() {
 
 export default function* userSaga() {
   yield all([
+    fork(watchLoadUser),
     fork(watchFollow),
     fork(watchUnfollow),
     fork(watchLogIn),
