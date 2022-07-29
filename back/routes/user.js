@@ -5,6 +5,42 @@ const passport = require("passport");
 const router = express.Router();
 const { isLoggedIn, isNotLoggedIn } = require("./middlewares");
 
+router.get("/", async (req, res, next) => {
+  try {
+    if (req.user) {
+      const fullUserWithoutPassword = await User.findOne({
+        // 다시 찾아서 그놈이랑 연결된 DB 다 들고옴
+        where: { id: req.user.id },
+        attributes: {
+          exclude: ["password"],
+        },
+        include: [
+          {
+            model: Post,
+            attributes: ["id"], // 정보 아이디만 가져오는거! 데이터 효율 위해서 다 들고 올 필요 없어서!!
+          },
+          {
+            model: User,
+            as: "Followings",
+            attributes: ["id"],
+          },
+          {
+            model: User,
+            as: "Followers",
+            attributes: ["id"],
+          },
+        ],
+      });
+      res.status(200).json(fullUserWithoutPassword);
+    } else {
+      res.status(200).json(null);
+    }
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+});
+
 router.post("/login", isNotLoggedIn, (req, res, next) => {
   console.log("LOGIN ROUTES RECEIVE API");
   //isAuthenticated.. 이런거 왜 여기다 넣으면 되지 따로 파일 만들어서 미들웨어?
