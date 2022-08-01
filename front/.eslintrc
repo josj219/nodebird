@@ -1,4 +1,8 @@
 {
+<<<<<<< HEAD
+=======
+  "parser": "babel-eslint",
+>>>>>>> 5b9e6f38f08cd145ed6f964c43cc4615ca7f8536
   "parserOptions": {
     "ecmaVersion": 2020,
     "sourceType": "module",
@@ -8,6 +12,7 @@
   },
   "env": {
     "browser": true,
+<<<<<<< HEAD
     "node": true
   },
   "extends": ["eslint:recommended", "plugin:react/recommended"],
@@ -15,6 +20,16 @@
   "rules": {
     "jsx-a11y/label-has-associated-control": "off",
     "jsx-a11y/anchor-is-valid": "off", 
+=======
+    "node": true,
+    "es6": true
+  },
+  "extends": ["airbnb"],
+  "plugins": ["import", "react-hooks"],
+  "rules": {
+    "jsx-a11y/label-has-associated-control": "off",
+    "jsx-a11y/anchor-is-valid": "off",
+>>>>>>> 5b9e6f38f08cd145ed6f964c43cc4615ca7f8536
     "no-param-reassign": "off"
   }
 }

@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import Head from "next/head";
 import { Button, Checkbox, Form, Input } from "antd";
 import styled from "styled-components";
@@ -9,6 +9,7 @@ import AppLayout from "../components/AppLayout";
 import useInput from "../hooks/useInput";
 import { SIGN_UP_REQUEST } from "../reducers/user";
 import { useDispatch, useSelector } from "react-redux";
+import Router from "next/router";
 
 const ErrorMessage = styled.div`
   color: red;
@@ -31,7 +32,21 @@ const Signup = () => {
   const [term, setTerm] = useState("");
   const [termError, setTermError] = useState("");
   const dispatch = useDispatch();
-  const { signUpLoading, me } = useSelector((state) => state.user);
+  const { signUpLoading, signUpDone, signUpError, me } = useSelector(
+    (state) => state.user
+  );
+
+  useEffect(() => {
+    if (me && me.id) {
+      Router.replace("/");
+    }
+  }, [me && me.id]);
+
+  useEffect(() => {
+    if (signUpDone) {
+      Router.replace("/");
+    }
+  }, [signUpDone]);
 
   const onChangePasswordCheck = useCallback(
     (e) => {
