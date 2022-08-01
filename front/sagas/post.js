@@ -11,6 +11,12 @@ import {
 import shortId from "shortid";
 
 import {
+  LIKE_POST_REQUEST,
+  LIKE_POST_SUCCESS,
+  LIKE_POST_FAILURE,
+  UNLIKE_POST_REQUEST,
+  UNLIKE_POST_SUCCESS,
+  UNLIKE_POST_FAILURE,
   ADD_POST_REQUEST,
   ADD_POST_SUCCESS,
   ADD_POST_FAILURE,
@@ -26,6 +32,48 @@ import {
   generateDummyPost,
 } from "../reducers/post";
 import { ADD_POST_TO_ME, REMOVE_POST_OF_ME } from "../reducers/user";
+
+function likePostAPI(data) {
+  return axios.patch(`/post/${data}/like`);
+}
+
+function* likePost(action) {
+  try {
+    console.log("Like POST API CALL ");
+    const result = yield call(likePostAPI, action.data);
+    yield put({
+      type: LIKE_POST_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    console.error(err);
+    yield put({
+      type: LIKE_POST_FAILURE,
+      data: err.response.data,
+    });
+  }
+}
+
+function unlikePostAPI(data) {
+  return axios.delete(`/post/${data}/like`);
+}
+
+function* unlikePost(action) {
+  try {
+    console.log("Like POST API CALL ");
+    const result = yield call(unlikePostAPI, action.data);
+    yield put({
+      type: UNLIKE_POST_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    console.error(err);
+    yield put({
+      type: UNLIKE_POST_FAILURE,
+      data: err.response.data,
+    });
+  }
+}
 
 function addPostAPI(data) {
   return axios.post("/post", { content: data });
@@ -54,13 +102,16 @@ function* addPost(action) {
   }
 }
 
+function loadPostAPI(data) {
+  return axios.get("./posts", data);
+}
+
 function* loadPost(action) {
   try {
-    // const result = yield call(addPostAPI, action.data);
-    yield delay(1000);
+    const result = yield call(loadPostAPI, action.data);
     yield put({
       type: LOAD_POSTS_SUCCESS,
-      data: generateDummyPost(10),
+      data: result.data,
     });
     //이렇게 사가에서 여러 개 액션 dispatch 호출해주면 여러 리듀서 데이터 바꿀 수 있음
   } catch (err) {
@@ -73,19 +124,17 @@ function* loadPost(action) {
 }
 
 function addCommentAPI(data) {
-  return axios.post(`/post/${data.postId}}/comment`, data); // 백엔드 사람이 알 수 있도록
+  return axios.post(`/post/${data.postId}/comment`, data); // 백엔드 사람이 알 수 있도록
 }
 
 function* addComment(action) {
   try {
     console.log("addComment REQUEST RECEIVED");
     const result = yield call(addCommentAPI, action.data);
-    yield delay(1000);
     console.log("ADDDDDDDD!!!!!!");
     yield put({
       type: ADD_COMMENT_SUCCESS,
       data: result.data,
-
       // action.data,
     });
   } catch (err) {
@@ -119,6 +168,14 @@ function* removePost(action) {
   }
 }
 
+function* watchLikePost() {
+  yield throttle(LIKE_POST_REQUEST, likePost);
+}
+
+function* watchUnlikePost() {
+  yield throttle(UNLIKE_POST_REQUEST, unlikePost);
+}
+
 function* watchLoadPosts() {
   yield throttle(5000, LOAD_POSTS_REQUEST, loadPost);
 }
@@ -137,6 +194,8 @@ function* watchAddComment() {
 
 export default function* postSaga() {
   yield all([
+    fork(watchLikePost),
+    fork(watchUnlikePost),
     fork(watchLoadPosts),
     fork(watchAddPost),
     fork(watchRemovePost),

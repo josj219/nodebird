@@ -20,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
     db.Post.hasMany(db.Comment);
     db.Post.hasMany(db.Image);
     db.Post.belongsTo(db.Post, { as: "Retweet" }); // 리트윗용
-    db.Post.belongsToMany(db.User, { through: "Like", as: "Likers" });
+    db.Post.belongsToMany(db.User, { through: "Like", as: "Likers" }); // post.addLikers, post.removeLikers 이런거 자동적으로 제공되어서 쓸 수 있음 - get add 등
   };
   return Post;
 };

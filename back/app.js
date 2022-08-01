@@ -3,12 +3,15 @@ const cors = require("cors");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const passport = require("passport");
+const app = express();
+const dotenv = require("dotenv");
+const morgan = require("morgan");
+
+const postsRouter = require("./routes/posts");
 const postRouter = require("./routes/post");
 const userRouter = require("./routes/user");
 const db = require("./models");
-const app = express();
 const passportConfig = require("./passport");
-const dotenv = require("dotenv");
 
 dotenv.config();
 
@@ -19,6 +22,10 @@ db.sequelize
   })
   .catch(console.error);
 passportConfig();
+
+app.use(morgan("dev"));
+//front에서 back 요청 보낼 때 어떤 요청 보냈는지 기록!! 디버깅 용
+
 app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 app.use(express.json()); // front 에서 json 형식으로 data 보낼 때
 app.use(express.urlencoded({ extended: true })); // form submit 했을 때
@@ -36,22 +43,15 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.get("/", (req, res) => {
-  res.send("hello express");
-});
+// app.get("/api/posts", (req, res) => {
+//   res.json([
+//     { id: 1, content: "hello" },
+//     { id: 2, content: "hello2" },
+//     { id: 3, content: "hello3" },
+//   ]);
+// });
 
-app.get("/api", (req, res) => {
-  res.send("hello api");
-});
-
-app.get("/api/posts", (req, res) => {
-  res.json([
-    { id: 1, content: "hello" },
-    { id: 2, content: "hello2" },
-    { id: 3, content: "hello3" },
-  ]);
-});
-
+app.use("/posts", postsRouter);
 app.use("/post", postRouter);
 app.use("/user", userRouter);
 
