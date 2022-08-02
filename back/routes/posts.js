@@ -1,11 +1,17 @@
 const express = require("express");
-
+const { Op } = require("sequelize");
 const { Post, User, Image, Comment } = require("../models");
 
 const router = express.Router();
 
 router.get("/", async (req, res, next) => {
   try {
+    let where = {};
+    if (parseInt(req.query.lastId, 10)) {
+      //초기 로딩 아닐 때
+      where.id = { [Op.lt]: parseInt(req.query.lastId, 10) };
+    }
+
     const posts = await Post.findAll({
       //where : {UserId:1}, //특정 아이디의 게시물만 들고와라는 조건
       limit: 10, // 10개만 가져와라는 조건 ... 페북같은거 생각해봐라
@@ -34,6 +40,19 @@ router.get("/", async (req, res, next) => {
           ],
         },
         { model: User, as: "Likers", attributes: ["id"] },
+        {
+          model: Post,
+          as: "Retweet",
+          include: [
+            {
+              model: User,
+              attributes: ["id", "nickname"],
+            },
+            {
+              model: Image,
+            },
+          ],
+        },
       ],
     });
     console.log(posts);
