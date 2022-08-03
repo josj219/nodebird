@@ -43,7 +43,7 @@ const changeNickname = {
 const rootReducer = (state, action) => {
   switch (action.type) {
     case HYDRATE:
-      console.log("HYDRATE", action);
+      //console.log("HYDRATE", action);
       return { ...state, ...action.payload };
     default: {
       const combinedReducers = combineReducers({
