@@ -10,9 +10,12 @@ router.get("/", async (req, res, next) => {
     if (parseInt(req.query.lastId, 10)) {
       //초기 로딩 아닐 때
       where.id = { [Op.lt]: parseInt(req.query.lastId, 10) };
+      // 라스트 아이디 보다 작은 10개
+      //               ㄴ'보다 작은' : Op  활용   Op.lt = lastid 보다 작은걸로 10 개
     }
 
     const posts = await Post.findAll({
+      where,
       //where : {UserId:1}, //특정 아이디의 게시물만 들고와라는 조건
       limit: 10, // 10개만 가져와라는 조건 ... 페북같은거 생각해봐라
       //offset: 100, // 101~110 번 가져와라
@@ -55,7 +58,6 @@ router.get("/", async (req, res, next) => {
         },
       ],
     });
-    console.log(posts);
     res.status(200).json(posts);
   } catch (error) {
     console.log(error);
