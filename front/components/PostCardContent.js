@@ -7,7 +7,7 @@ const PostCardContent = ({ postData }) => (
     {postData.split(/(#[^\s#]+)/g).map((v) => {
       if (v.match(/(#[^\s]+)/)) {
         return (
-          <Link as={`/hashtag/${v.slice(1)}`} key={v}>
+          <Link href={`/hashtag/${v.slice(1)}`} key={v}>
             <a>{v}</a>
           </Link>
         );
@@ -17,8 +17,6 @@ const PostCardContent = ({ postData }) => (
   </div>
 );
 
-PostCardContent.propTypes = {
-  postData: PropTypes.string.isRequired,
-};
+PostCardContent.propTypes = { postData: PropTypes.string.isRequired };
 
 export default PostCardContent;

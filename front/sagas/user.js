@@ -32,10 +32,13 @@ import {
   REMOVE_FOLLOWER_FAILURE,
   REMOVE_FOLLOWER_REQUEST,
   REMOVE_FOLLOWER_SUCCESS,
+  LOAD_MY_INFO_FAILURE,
+  LOAD_MY_INFO_SUCCESS,
+  LOAD_MY_INFO_REQUEST,
 } from "../reducers/user";
 
-function loadUserAPI() {
-  return axios.get("/user");
+function loadUserAPI(data) {
+  return axios.get(`/user/${data}`);
 }
 
 function* loadUser(action) {
@@ -53,6 +56,29 @@ function* loadUser(action) {
     yield put({
       // 요 밑에 2개 이게 액션 개체인데, put은 거의 dispatch (액션을 하는) 느낌
       type: LOAD_USER_FAILURE,
+      error: err.response.data,
+    });
+  }
+}
+
+function loadMyInfoAPI() {
+  return axios.get("/user");
+}
+
+function* loadMyInfo() {
+  try {
+    const result = yield call(loadMyInfoAPI);
+    // call 은 동기 라서 결과값 기다린다 , fork 는 비동기라서 결과값 안받고 바로 다음꺼 실행
+    yield put({
+      //yield 넣어두는 이유 - generator는 테스트하기가 좋음 - 하나하나씩 보면서 문제가 어딘지
+      type: LOAD_MY_INFO_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    console.error(err);
+    yield put({
+      // 요 밑에 2개 이게 액션 개체인데, put은 거의 dispatch (액션을 하는) 느낌
+      type: LOAD_MY_INFO_FAILURE,
       error: err.response.data,
     });
   }
@@ -262,6 +288,10 @@ function* watchChangeNickname() {
   yield takeLatest(CHANGE_NICKNAME_REQUEST, changeNickname);
 }
 
+function* watchLoadMyInfo() {
+  yield takeLatest(LOAD_MY_INFO_REQUEST, loadMyInfo);
+}
+
 function* watchLoadUser() {
   yield takeLatest(LOAD_USER_REQUEST, loadUser);
 }
@@ -301,6 +331,7 @@ export default function* userSaga() {
     fork(watchLoadFollowings),
     fork(watchChangeNickname),
     fork(watchLoadUser),
+    fork(watchLoadMyInfo),
     fork(watchFollow),
     fork(watchUnfollow),
     fork(watchLogIn),
