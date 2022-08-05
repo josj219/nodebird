@@ -54,6 +54,8 @@ const FollowList = ({ header, data, onClickMore, loading }) => {
 FollowList.propTypes = {
   header: PropTypes.string.required,
   data: PropTypes.array.required,
+  onClickMore: PropTypes.func.isRequired,
+  loading: PropTypes.bool.isRequired,
 };
 
 export default FollowList;
