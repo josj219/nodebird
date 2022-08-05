@@ -5,18 +5,21 @@
   "main": "index.js",
   "scripts": {
     "dev": "next",
-    "build": "next build",
+    "build": "cross-env ANALYZE=true NODE_ENV=production next build",
     "start": "next start"
   },
   "author": "josj",
   "license": "MIT",
   "dependencies": {
+    "@next/bundle-analyzer": "^12.2.4",
     "antd": "^4.2.5",
     "axios": "^0.27.2",
     "babel-eslint": "^10.1.0",
     "babel-plugin-styled-components": "^2.0.7",
+    "cross-env": "^7.0.3",
     "faker": "^4.1.0",
     "immer": "^9.0.15",
+    "moment": "^2.29.4",
     "next": "^9.1.0",
     "next-redux-wrapper": "^6.0.2",
     "passport-local": "^1.0.0",

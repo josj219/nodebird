@@ -1,12 +1,13 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import PropTypes from "prop-types";
 import Link from "next/link";
 import { Menu, Input, Button, Row, Col } from "antd";
 import styled from "styled-components";
 import { useSelector } from "react-redux";
-
+import Router from "next/router";
 import UserProfile from "../components/UserProfile";
 import LoginForm from "../components/LoginForm";
+import useInput from "../hooks/useInput";
 
 import { createGlobalStyle } from "styled-components";
 
@@ -30,9 +31,14 @@ const SearchInput = styled(Input.Search)`
 
 const AppLayout = ({ children }) => {
   //const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [searchInput, onChangeSearchInput] = useInput("");
   const { me } = useSelector((state) => state.user);
 
-  console.log(me);
+  //console.log(me);
+
+  const onSearch = useCallback(() => {
+    Router.push(`/hashtag/${searchInput}`);
+  }, [searchInput]);
 
   return (
     <div>
@@ -49,7 +55,12 @@ const AppLayout = ({ children }) => {
           </Link>
         </Menu.Item>
         <Menu.Item key="mail">
-          <SearchInput enterButton />
+          <SearchInput
+            enterButton
+            value={searchInput}
+            onChange={onChangeSearchInput}
+            onSearch={onSearch}
+          />
         </Menu.Item>
         <Menu.Item key="mail">
           <Link href="/signup">

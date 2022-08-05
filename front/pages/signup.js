@@ -13,6 +13,7 @@ import Router from "next/router";
 
 import { END } from "redux-saga";
 import axios from "axios";
+import wrapper from "../store/configureStore";
 
 const ErrorMessage = styled.div`
   color: red;
