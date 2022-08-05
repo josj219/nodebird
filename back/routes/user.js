@@ -1,12 +1,12 @@
 const express = require("express");
 const bcrypt = require("bcryptjs");
-const { User, Post } = require("../models");
+const { User, Post, Comment, Image } = require("../models");
 const passport = require("passport");
 const router = express.Router();
 const { isLoggedIn, isNotLoggedIn } = require("./middlewares");
 
 router.get("/", async (req, res, next) => {
-  console.log(req.headers);
+  //console.log(req.headers);
   try {
     if (req.user) {
       const fullUserWithoutPassword = await User.findOne({
@@ -42,6 +42,68 @@ router.get("/", async (req, res, next) => {
   }
 });
 
+router.get("/:id/posts", async (req, res, next) => {
+  // GET /user/1/posts
+  try {
+    const user = await User.findOne({ where: { id: req.params.id } });
+    if (user) {
+      const where = {};
+      if (parseInt(req.query.lastId, 10)) {
+        // 초기 로딩이 아닐 때
+        where.id = { [Op.lt]: parseInt(req.query.lastId, 10) };
+      } // 21 20 19 18 17 16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1
+      const posts = await user.getPosts({
+        where,
+        limit: 10,
+        include: [
+          {
+            model: Image,
+          },
+          {
+            model: Comment,
+            include: [
+              {
+                model: User,
+                attributes: ["id", "nickname"],
+              },
+            ],
+          },
+          {
+            model: User,
+            attributes: ["id", "nickname"],
+          },
+          {
+            model: User,
+            through: "Like",
+            as: "Likers",
+            attributes: ["id"],
+          },
+          {
+            model: Post,
+            as: "Retweet",
+            include: [
+              {
+                model: User,
+                attributes: ["id", "nickname"],
+              },
+              {
+                model: Image,
+              },
+            ],
+          },
+        ],
+      });
+      console.log(posts);
+      res.status(200).json(posts);
+    } else {
+      res.status(404).send("존재하지 않는 사용자입니다.");
+    }
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+});
+
 router.post("/login", isNotLoggedIn, (req, res, next) => {
   console.log("LOGIN ROUTES RECEIVE API");
   //isAuthenticated.. 이런거 왜 여기다 넣으면 되지 따로 파일 만들어서 미들웨어?
@@ -54,7 +116,7 @@ router.post("/login", isNotLoggedIn, (req, res, next) => {
       return next(error);
     }
     if (info) {
-      console.log(info);
+      //console.log(info);
       return res.status(401).send(info.reason); //http 상태코드 검색하면 알 수 잇음
     }
     return req.login(user, async (loginErr) => {
@@ -188,7 +250,9 @@ router.get("/followers", isLoggedIn, async (req, res, next) => {
     if (!user) {
       res.status(403).send("없는 사람을 팔로우하려고 하시네요?");
     }
-    const followers = await user.getFollowers();
+    const followers = await user.getFollowers({
+      limit: parseInt(req.query.limit, 10),
+    });
     res.status(200).json(followers);
   } catch (error) {
     console.error(error);
@@ -202,10 +266,52 @@ router.get("/followings", isLoggedIn, async (req, res, next) => {
     if (!user) {
       res.status(403).send("없는 사람을 팔로우하려고 하시네요?");
     }
-    const followings = await user.getFollowings();
+    const followings = await user.getFollowings({
+      limit: parseInt(req.query.limit, 10),
+    });
     res.status(200).json(followings);
   } catch (error) {
     console.error(error);
+    next(error);
+  }
+});
+
+router.get("/:userId", async (req, res, next) => {
+  //console.log(req.headers);
+  try {
+    const fullUserWithoutPassword = await User.findOne({
+      // 다시 찾아서 그놈이랑 연결된 DB 다 들고옴
+      where: { id: req.params.userId },
+      attributes: {
+        exclude: ["password"],
+      },
+      include: [
+        {
+          model: Post,
+          attributes: ["id"], // 정보 아이디만 가져오는거! 데이터 효율 위해서 다 들고 올 필요 없어서!!
+        },
+        {
+          model: User,
+          as: "Followings",
+          attributes: ["id"],
+        },
+        {
+          model: User,
+          as: "Followers",
+          attributes: ["id"],
+        },
+      ],
+    });
+    if (fullUserWithoutPassword) {
+      const data = fullUserWithoutPassword.toJSON();
+      data.Posts = data.Posts.length;
+      data.Followers = data.Followers.length;
+      data.Followings = data.Followings.length;
+      res.status(200).json(data);
+    }
+    res.status(404).json("존재하지 않는 사용자입니다.");
+  } catch (error) {
+    console.log(error);
     next(error);
   }
 });
