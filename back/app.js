@@ -35,7 +35,6 @@ if (process.env.NODE_ENV === "production") {
   app.use(morgan("dev"));
 }
 
-app.use(morgan("dev"));
 //front에서 back 요청 보낼 때 어떤 요청 보냈는지 기록!! 디버깅 용
 
 app.use(
