@@ -2,8 +2,9 @@ import { fork, all } from "redux-saga/effects";
 import axios from "axios";
 import postSaga from "./post";
 import userSaga from "./user";
+import backUrl from "../config/config";
 
-axios.defaults.baseURL = "http://localhost:3065";
+axios.defaults.baseURL = backUrl; //백엔드 아이피로 변경
 axios.defaults.withCredentials = true;
 
 export default function* rootSaga() {
