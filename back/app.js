@@ -7,6 +7,8 @@ const app = express();
 const dotenv = require("dotenv");
 const morgan = require("morgan");
 const path = require("path");
+const hpp = require("hpp");
+const helmet = require("helmet");
 
 const hashtagRouter = require("./routes/hashtag");
 const postsRouter = require("./routes/posts");
@@ -25,10 +27,20 @@ db.sequelize
   .catch(console.error);
 passportConfig();
 
+if (process.env.NODE_ENV === "production") {
+  app.use(morgan("combined")); // 배포일 떄 로그 다양하게 들고올 수 있음 - 누가 로그인 관련 등
+  app.use(hpp());
+  app.use(helmet());
+} else {
+  app.use(morgan("dev"));
+}
+
 app.use(morgan("dev"));
 //front에서 back 요청 보낼 때 어떤 요청 보냈는지 기록!! 디버깅 용
 
-app.use(cors({ origin: "http://localhost:3000", credentials: true }));
+app.use(
+  cors({ origin: ["http://localhost:3000", "nodebird.com"], credentials: true })
+);
 app.use("/", express.static(path.join(__dirname, "uploads")));
 app.use(express.json()); // front 에서 json 형식으로 data 보낼 때
 app.use(express.urlencoded({ extended: true })); // form submit 했을 때
