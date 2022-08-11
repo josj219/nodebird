@@ -1,3 +1,3 @@
-const backUrl = "http://15.164.48.179";
+const backUrl = "http://13.209.167.153";
 
 export default backUrl;
