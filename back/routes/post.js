@@ -2,6 +2,10 @@ const express = require("express");
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
+const multerS3 = require("multer-s3");
+const AWS = require("aws-sdk");
+
+dotenv.config();
 
 const router = express.Router();
 const { Post, Comment, Image, User, Hashtag } = require("../models");
@@ -14,19 +18,33 @@ try {
   fs.mkdirSync("uploads");
 }
 
+AWS.config.update({
+  accessKeyId: process.env.S3_ACCESS_KEY_ID,
+  secretAccessKey: process.env.S3_ACCESS_KEY_ID,
+  region: "ap-northeast-2",
+});
 const upload = multer({
-  storage: multer.diskStorage({
-    destination(req, file, done) {
-      done(null, "uploads");
-    },
-    filename(req, file, done) {
-      // 제로초.png
-      const ext = path.extname(file.originalname); // 확장자 추출(.png)
-      const basename = path.basename(file.originalname, ext); // 제로초
-      done(null, basename + "_" + new Date().getTime() + ext); // 제로초15184712891.png
-    },
-  }),
-  limits: { fileSize: 20 * 1024 * 1024 }, // 20MB
+  // storage: multer.diskStorage({
+  //   destination(req, file, done) {
+  //     done(null, "uploads");
+  //   },
+  //   filename(req, file, done) {
+  //     // 제로초.png
+  //     const ext = path.extname(file.originalname); // 확장자 추출(.png)
+  //     const basename = path.basename(file.originalname, ext); // 제로초
+  //     done(null, basename + "_" + new Date().getTime() + ext); // 제로초15184712891.png
+  //   },
+  // }),
+  storage:multerS3({
+    storage: multerS3({
+      s3: new AWS.S3(),
+      bucket: 'react-nodebird-jo',
+      key(req, file, cb) {
+        cb(null, `original/${Date.now()}_${path.basename(file.originalname)}`)
+      }
+    }),
+    limits: { fileSize: 20 * 1024 * 1024 }, // 20MB
+  
 });
 
 router.post("/", isLoggedIn, upload.none(), async (req, res, next) => {
@@ -85,7 +103,7 @@ router.post("/", isLoggedIn, upload.none(), async (req, res, next) => {
 router.post("/images", isLoggedIn, upload.array("image"), (req, res, next) => {
   // POST /post/images
   //console.log(req.files);
-  res.json(req.files.map((v) => v.filename));
+  res.json(req.files.map((v) => v.location));
 });
 
 router.post("/:postId/comment", isLoggedIn, async (req, res, next) => {
