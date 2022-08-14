@@ -91,6 +91,8 @@ function logInAPI(data) {
 function* logIn(action) {
   try {
     const result = yield call(logInAPI, action.data);
+    console.log("API 통신 완료");
+    console.log(result);
     // call 은 동기 라서 결과값 기다린다 , fork 는 비동기라서 결과값 안받고 바로 다음꺼 실행
     yield delay(1000);
     yield put({
