@@ -30,7 +30,7 @@ passportConfig();
 if (process.env.NODE_ENV === "production") {
   app.use(morgan("combined")); // 배포일 떄 로그 다양하게 들고올 수 있음 - 누가 로그인 관련 등
   app.use(hpp());
-  app.use(helmet({ contentSecurityPolicy: false }));
+  app.use(helmet());
 } else {
   app.use(morgan("dev"));
 }
@@ -55,11 +55,6 @@ app.use(
     saveUninitialized: false,
     resave: false,
     secret: process.env.COOKIE_SECRET,
-    cookie: {
-      httpOnly: true,
-      secure: false,
-      domain: process.env.NODE_ENV === "production",
-    },
   })
 );
 app.use(passport.initialize());
