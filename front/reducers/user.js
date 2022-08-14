@@ -243,6 +243,7 @@ const reducer = (state = initialState, action) =>
         draft.logInDone = false;
         break;
       case LOG_IN_SUCCESS:
+        console.log("로그인 성공함");
         draft.logInLoading = false;
         draft.logInDone = true;
         draft.me = action.data;
